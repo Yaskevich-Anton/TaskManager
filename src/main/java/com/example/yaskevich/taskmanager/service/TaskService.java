@@ -14,13 +14,12 @@ public class TaskService {
     private TaskService(){
     }
     public List<TaskDto> findAll(){
-return taskDao.findAll().stream().
-        map(task -> new TaskDto(
-                task.getId(),
+    return taskDao.findAll().stream().
+        map(task -> TaskDto.builder().id(task.getId()).description(
                 """
                  %s
-                 """.formatted(task.getStatus())
-        ))
+                 """.formatted(task.getStatus())).build()
+        )
         .collect(toList());
     }
     public static TaskService getInstance(){

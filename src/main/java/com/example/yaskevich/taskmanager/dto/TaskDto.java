@@ -1,11 +1,11 @@
 package com.example.yaskevich.taskmanager.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.example.yaskevich.taskmanager.dao.TaskDao;
+import lombok.*;
 
-@Data
-@AllArgsConstructor
+@Value
+@Builder
 public class TaskDto {
-    private final Long id;
-    private final String description;
+    Long id;
+    String description;
 }

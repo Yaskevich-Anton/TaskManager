@@ -1,17 +1,15 @@
 package com.example.yaskevich.taskmanager.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class Task {
 
-    private Long id;
-    private String taskName;
-    private LocalDateTime deadLine;
-    private Status status;
+    Long id;
+    String taskName;
+    LocalDateTime deadLine;
+    Status status;
 }
