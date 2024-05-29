@@ -2,10 +2,17 @@ package com.example.yaskevich.taskmanager.entity;
 
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class User {
-
-   String username;
-   String password;
+   private Integer id;
+   private String name;
+   private String email;
+   private String password;
+   private LocalDate birthday;
+   private Role role;
 }

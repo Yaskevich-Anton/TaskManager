@@ -23,7 +23,7 @@ public class ConnectionManager {
             throw new RuntimeException(e);
         }
     }
-    @SneakyThrows
+    @SneakyThrows // не юзать
     public static Connection get() {
             return DriverManager.getConnection(
                     PropertiesUtil.get(URL_KEY),

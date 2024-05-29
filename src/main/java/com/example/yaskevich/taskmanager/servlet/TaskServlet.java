@@ -1,6 +1,7 @@
 package com.example.yaskevich.taskmanager.servlet;
 
 import com.example.yaskevich.taskmanager.service.TaskService;
+import com.example.yaskevich.taskmanager.util.JspHelper;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,22 +15,12 @@ import java.nio.charset.StandardCharsets;
 public class TaskServlet extends HttpServlet {
     private final TaskService taskService = TaskService.getInstance();
 
-
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-         resp.setContentType("text/html");
-         resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-         var printWriter = resp.getWriter();
-         printWriter.write("<h1>Список задач:</h1>");
-         printWriter.write("ul");
-         taskService.findAll().forEach(taskDto -> {
-             printWriter.write("""
-                     <li>
-                     <a href ="/description?id=%d"> %s</a>
-                     </li>
-                     """.formatted(taskDto.getId(),taskDto.getDescription()));
-         });
-        printWriter.write("/ul");
+
+        var taskID = Long.valueOf(req.getParameter("taskID"));
+        req.setAttribute("tasks",taskService.findById(taskID));
+        req.getRequestDispatcher(JspHelper.getPath("tasks")).forward(req,resp);
+
     }
 }

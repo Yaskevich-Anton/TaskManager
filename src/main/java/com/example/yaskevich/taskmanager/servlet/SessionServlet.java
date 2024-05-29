@@ -17,7 +17,7 @@ public class SessionServlet extends HttpServlet {
        var session = req.getSession();
        var user = (UserDto) session.getAttribute(USER);
        if(user == null) {
-           user = UserDto.builder().id(25L).username("test@gmail.com").build();
+           user = UserDto.builder().id(25).name("test@gmail.com").build();
            session.setAttribute(USER,user);
        }
 
