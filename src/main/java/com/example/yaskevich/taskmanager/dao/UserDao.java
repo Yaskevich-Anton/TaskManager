@@ -62,12 +62,10 @@ public class UserDao implements Dao<Integer, User> {
         try (var connection = ConnectionManager.get();
              var prepareStatement = connection.prepareStatement(SAVE_SQL,RETURN_GENERATED_KEYS)) {
             prepareStatement.setObject(1, entity.getName());
-            prepareStatement.setObject(2, entity.getBirthday());
+            prepareStatement.setObject(2,entity.getBirthday());
             prepareStatement.setObject(3, entity.getEmail());
             prepareStatement.setObject(4, entity.getPassword());
             prepareStatement.setObject(5, entity.getRole().name());
-
-
             prepareStatement.executeUpdate();
 
             var generatedKeys = prepareStatement.getGeneratedKeys();
@@ -85,7 +83,6 @@ public class UserDao implements Dao<Integer, User> {
         return User.builder()
                 .id(resultSet.getObject("id", Integer.class))
                 .name(resultSet.getObject("name",String.class))
-                .birthday(resultSet.getObject("birthday", LocalDate.class))
                 .email(resultSet.getObject("email",String.class))
                 .password(resultSet.getObject("password", String.class))
                 .role(Role.find(resultSet.getObject("role", String.class)).orElse(null))

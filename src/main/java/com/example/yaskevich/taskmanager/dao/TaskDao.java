@@ -22,6 +22,10 @@ public class TaskDao implements Dao<Long, Task> {
             FROM task_manager.tasks
             WHERE id = ?
             """;
+    private static final String ADD_TASK = """
+            INSERT INTO tasks (task_name, deadline, status)
+            VALUES (?, ?, ?)
+            """;
 
     private TaskDao() {
 
@@ -79,8 +83,20 @@ public class TaskDao implements Dao<Long, Task> {
 
     @Override
     public Task save(Task entity) {
-        return null;
+        try (var connection = ConnectionManager.get()) {
+            var prepareStatement = connection.prepareStatement(ADD_TASK);
+            prepareStatement.setString(1, entity.getTaskName());
+            prepareStatement.setObject(2, entity.getDeadLine());
+            prepareStatement.setString(3, entity.getStatus().toString());
+            prepareStatement.executeUpdate();
+            System.out.println("Task added successfully.");
+        } catch (SQLException e) {
+            System.out.println("Error adding task: " + e.getMessage());
+        }
+
+        return entity;
     }
+
 
     private Task buildTask(ResultSet resultSet) throws SQLException {
 

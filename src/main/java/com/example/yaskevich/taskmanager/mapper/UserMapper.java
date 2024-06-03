@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 public class UserMapper implements Mapper<User, UserDto> {
 
     public static final UserMapper INSTANCE = new UserMapper();
-// MapStruct
+    // MapStruct
     @Override
     public UserDto mapFrom(User object) {
         return UserDto.builder()
