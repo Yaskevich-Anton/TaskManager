@@ -15,16 +15,20 @@ public class TaskDao implements Dao<Long, Task> {
     public static final TaskDao INSTANCE = new TaskDao();
     private static final String FIND_ALL = """
             SELECT *
-            FROM task_manager.tasks
-                """;
+            FROM tasks
+            """;
+
     private static final String FIND_BY_ID = """
             SELECT id
-            FROM task_manager.tasks
+            FROM postgres.tasks
             WHERE id = ?
             """;
     private static final String ADD_TASK = """
-            INSERT INTO tasks (task_name, deadline, status)
+            INSERT INTO tasks (taskname, deadline, status)
             VALUES (?, ?, ?)
+            """;
+    private static final String DELETE_TASK = """
+            DELETE FROM tasks WHERE id = ?
             """;
 
     private TaskDao() {
@@ -39,8 +43,8 @@ public class TaskDao implements Dao<Long, Task> {
     public List<Task> findAll() {
         try (var connection = ConnectionManager.get();
              var prepareStatement = connection.prepareStatement(FIND_ALL)) {
-            var resultSet = prepareStatement.executeQuery();
 
+            var resultSet = prepareStatement.executeQuery();
             List<Task> tasks = new ArrayList<>();
             while (resultSet.next())
                 tasks.add(buildTask(resultSet));
@@ -53,40 +57,46 @@ public class TaskDao implements Dao<Long, Task> {
 
     @Override
     public Optional<Task> findById(Long id) {
-
-        List<Task> result = new ArrayList<>();
         try {
             var connection = ConnectionManager.get();
             var preparedStatement = connection.prepareStatement(FIND_BY_ID);
             preparedStatement.setLong(1, id);
             var resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                result.add(resultSet.getObject("tasks", Task.class));
+            if (resultSet.next()) {
+                return Optional.ofNullable(resultSet.getObject("tasks", Task.class));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return Optional.ofNullable(result.isEmpty() ? null : result.get(0));
+        return Optional.empty();
     }
 
 
     @Override
-    public boolean delete(Long id) {
+    public boolean delete(Integer taskId) {
+        try (var connection = ConnectionManager.get();
+             var prepareStatement = connection.prepareStatement(DELETE_TASK)) {
+
+            prepareStatement.setInt(1, taskId);
+
+            int rowsAffected = prepareStatement.executeUpdate();
+
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         return false;
     }
 
-    @Override
-    public void update(Task entity) {
-
-    }
 
     @Override
     public Task save(Task entity) {
         try (var connection = ConnectionManager.get()) {
             var prepareStatement = connection.prepareStatement(ADD_TASK);
             prepareStatement.setString(1, entity.getTaskName());
-            prepareStatement.setObject(2, entity.getDeadLine());
+            prepareStatement.setObject(2, entity.getDeadline());
             prepareStatement.setString(3, entity.getStatus().toString());
             prepareStatement.executeUpdate();
             System.out.println("Task added successfully.");
@@ -100,9 +110,9 @@ public class TaskDao implements Dao<Long, Task> {
 
     private Task buildTask(ResultSet resultSet) throws SQLException {
 
-        return new Task(resultSet.getObject("id", Long.class),
+        return new Task(resultSet.getObject("id", Integer.class),
                 resultSet.getObject("taskName", String.class),
-                resultSet.getObject("deadLine", LocalDateTime.class),
+                resultSet.getObject("deadline", LocalDateTime.class),
                 Status.valueOf(resultSet.getObject("status", String.class)));
 
     }

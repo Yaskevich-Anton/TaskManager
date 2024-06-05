@@ -1,7 +1,8 @@
 package com.example.yaskevich.taskmanager.servlet;
 
+import com.example.yaskevich.taskmanager.dao.TaskDao;
 import com.example.yaskevich.taskmanager.dto.CreateTaskDto;
-import com.example.yaskevich.taskmanager.dto.TaskDto;
+import com.example.yaskevich.taskmanager.entity.Task;
 import com.example.yaskevich.taskmanager.service.TaskService;
 import com.example.yaskevich.taskmanager.util.JspHelper;
 
@@ -10,47 +11,48 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Optional;
+import java.util.List;
 
-@WebServlet("/tasks")
+@WebServlet("/createTask")
 public class TaskServlet extends HttpServlet {
-    private final TaskService taskService = TaskService.getInstance();
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        var taskIDString = req.getParameter("taskID");
-
-        if (taskIDString != null && !taskIDString.isEmpty()) {
-            try {
-                Long taskID = Long.parseLong(taskIDString);
-                Optional<TaskDto> taskDtoOptional = taskService.findById(taskID);
-                if (taskDtoOptional.isPresent()) {
-                    TaskDto taskDto = taskDtoOptional.get();
-                    req.getRequestDispatcher(JspHelper.getPath("tasks")).forward(req,resp);
-                } else {
-                    resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    resp.getWriter().println("AAAA.");
-                }
-            } catch (NumberFormatException e) {
-                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                resp.getWriter().println("BBBB");
-
-            }
-        } else {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            resp.getWriter().println("CCCC.");
-        }
-
+        List<Task> tasks = TaskDao.INSTANCE.findAll();
+        req.setAttribute("tasks", tasks);
+        req.getRequestDispatcher(JspHelper.getPath("tasks"))
+                .forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        var taskDto = CreateTaskDto.builder()
-                .taskName(req.getParameter("name"))
-                .status(req.getParameter("status"))
-                .deadLine(req.getParameter("deadline"))
-                .build();
 
+        String taskIdParam = req.getParameter("taskId");
+        if (taskIdParam != null) {
+            int taskId = Integer.parseInt(taskIdParam);
+
+
+            boolean isDeleted = TaskDao.INSTANCE.delete(taskId);
+
+            if (isDeleted) {
+
+                resp.sendRedirect(req.getContextPath() + "/createTask");
+                return;
+            } else {
+
+                resp.sendRedirect(req.getContextPath() + "/tasks.jsp?error=delete_failed");
+                return;
+            }
+        }
+
+        var taskDto = CreateTaskDto.builder()
+                .taskName(req.getParameter("taskName"))
+                .deadLine(req.getParameter("deadline"))
+                .status(req.getParameter("status"))
+                .build();
+        TaskService.save(taskDto);
+
+        resp.sendRedirect(req.getContextPath() + "/createTask");
     }
 }

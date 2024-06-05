@@ -13,20 +13,18 @@ import static java.util.stream.Collectors.toList;
 
 public class TaskService {
     private static final TaskService INSTANCE = new TaskService();
-    private final TaskDao taskDao = TaskDao.getInstance();
+    private static final TaskDao taskDao = TaskDao.getInstance();
 
-    private final CreateTaskMapper createTaskMapper = CreateTaskMapper.getInstance();
+    private static final CreateTaskMapper createTaskMapper = CreateTaskMapper.getInstance();
 
-    private TaskService() {
-    }
 
     public List<TaskDto> findAll() {
         return taskDao.findAll().stream().
-                map(task -> TaskDto.builder().id(task.getId()).description(
+                map(task -> TaskDto.builder().id((task.getId())).description(
                                 """
                                         %s - %s - %s
                                         """.formatted(task.getStatus(),
-                                        task.getDeadLine(),
+                                        task.getDeadline(),
                                         task.getTaskName())).
                         build()
                 )
@@ -40,20 +38,14 @@ public class TaskService {
                 .description(String.format("%s - %s - %s",
                         task.getTaskName(),
                         task.getStatus(),
-                        task.getDeadLine()))
+                        task.getDeadline()))
                 .build());
-//        return taskDao.findById(id).map(task -> TaskDto.builder()
-//                .id(task.getId())
-//                .description(String.format("%s - %s - %s",
-//                        task.getTaskName(),
-//                        task.getStatus(),
-//                        task.getDeadLine()))
-//                .build());
+
     }
-    public Long save(CreateTaskDto taskDto) {
+
+    public static void save(CreateTaskDto taskDto) {
         var taskEntity = createTaskMapper.mapFrom(taskDto);
         taskDao.save(taskEntity);
-        return taskEntity.getId();
     }
 
     public static TaskService getInstance() {

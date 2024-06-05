@@ -13,7 +13,7 @@
     <title>Title</title>
 </head>
 <body>
-<form action="/registration" method="post">
+<form action="${pageContext.request.contextPath}/registration" method="post">
     <label for="name">Name:
         <input type="text" name="name" id="name"/>
     </label><br></br>

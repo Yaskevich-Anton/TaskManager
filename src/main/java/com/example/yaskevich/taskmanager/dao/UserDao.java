@@ -20,6 +20,8 @@ public class UserDao implements Dao<Integer, User> {
             "INSERT INTO users (name, birthday, email, password, role) VALUES " + "(?,?,?,?,?)";
     private static final String EMAIL_AND_PASSWORD_SQL =
             "SELECT * FROM users WHERE email = ? AND password = ?";
+    private static final String FIND_BY_ID = """
+            SELECT * FROM tasks WHERE users_id = ?""";
     @SneakyThrows
     public Optional<User> findByLoginAndPassword(String email, String password){
         try (var connection = ConnectionManager.get();
@@ -44,6 +46,7 @@ public class UserDao implements Dao<Integer, User> {
     @Override
     public Optional<User> findById(Integer id) {
         return Optional.empty();
+
     }
 
     @Override
@@ -51,10 +54,6 @@ public class UserDao implements Dao<Integer, User> {
         return false;
     }
 
-    @Override
-    public void update(User entity) {
-
-    }
 
     @Override
     @SneakyThrows

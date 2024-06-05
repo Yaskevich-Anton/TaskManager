@@ -1,12 +1,9 @@
 package com.example.yaskevich.taskmanager.mapper;
 
 import com.example.yaskevich.taskmanager.dto.CreateTaskDto;
-import com.example.yaskevich.taskmanager.dto.TaskDto;
-import com.example.yaskevich.taskmanager.entity.Role;
 import com.example.yaskevich.taskmanager.entity.Status;
 import com.example.yaskevich.taskmanager.entity.Task;
-import com.example.yaskevich.taskmanager.entity.User;
-import com.example.yaskevich.taskmanager.util.LocalDateFormatter;
+import com.example.yaskevich.taskmanager.util.LocalDateTimeFormatter;
 
 import java.time.LocalDateTime;
 
@@ -23,7 +20,7 @@ public class CreateTaskMapper implements Mapper<CreateTaskDto, Task>{
         return Task.builder()
                 .taskName(object.getTaskName())
                 .status(Status.valueOf(object.getStatus()))
-                .deadLine(LocalDateTime.parse(object.getDeadLine()))
+                .deadline(LocalDateTimeFormatter.format(object.getDeadLine()))
                 .build();
     }
 }

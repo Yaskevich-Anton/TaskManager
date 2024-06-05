@@ -9,6 +9,6 @@ import java.time.LocalDateTime;
 @Value
 @Builder
 public class TaskDto {
-    Long id;
+    Integer id;
     String description;
 }

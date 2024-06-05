@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 @Builder
 public class Task {
 
-   private Long id;
+   private Integer id;
    private String taskName;
-   private LocalDateTime deadLine;
+   private LocalDateTime deadline;
    private Status status;
 }
